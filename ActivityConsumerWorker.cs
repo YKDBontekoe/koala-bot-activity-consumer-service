@@ -1,16 +1,25 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Koala.ActivityConsumerService.Services.Interfaces;
+using Microsoft.Extensions.Hosting;
 
 namespace Koala.ActivityConsumerService;
 
 public class ActivityConsumerWorker : IHostedService
 {
-    public Task StartAsync(CancellationToken cancellationToken)
+    private readonly IMessageConsumerService _messageConsumerService;
+
+    public ActivityConsumerWorker(IMessageConsumerService messageConsumerService)
     {
-        throw new NotImplementedException();
+        _messageConsumerService = messageConsumerService;
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        await _messageConsumerService.RegisterOnMessageHandlerAndReceiveMessages();
+    }
+
+    public async Task StopAsync(CancellationToken cancellationToken)
+    {
+        await _messageConsumerService.DisposeAsync()!;
+        await _messageConsumerService.CloseQueueAsync()!;
     }
 }

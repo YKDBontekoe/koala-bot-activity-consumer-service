@@ -1,4 +1,8 @@
 ﻿using Koala.ActivityConsumerService.Options;
+using Koala.ActivityConsumerService.Repositories;
+using Koala.ActivityConsumerService.Repositories.Interfaces;
+using Koala.ActivityConsumerService.Services;
+using Koala.ActivityConsumerService.Services.Interfaces;
 using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,8 +32,9 @@ internal static class Program
             {
                 ConfigureOptions(services, hostContext.Configuration);
                 ConfigureServiceBus(services);
-                
-                
+
+                services.AddTransient<IActivityRepository, ActivityRepository>();
+                services.AddTransient<IMessageConsumerService, MessageConsumerService>();
                 services.AddHostedService<ActivityConsumerWorker>();
             })
             .UseConsoleLifetime()
