@@ -1,7 +1,7 @@
 ﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: koala-attachment-consumer-service
+  name: koala-activity-consumer-service
 spec:
     replicas: 1
     strategy:
@@ -11,16 +11,16 @@ spec:
         maxUnavailable: 1
     selector:
         matchLabels:
-          app: koala-attachment-consumer-service
+          app: koala-activity-consumer-service
     template:
         metadata:
           labels:
-            app: koala-attachment-consumer-service
+            app: koala-activity-consumer-service
         spec:
           restartPolicy: Always
           containers:
-          - name: koala-attachment-consumer-service
-            image: ykdbonteregistry.azurecr.io/koala-attachment-consumer-service:v1
+          - name: koala-activity-consumer-service
+            image: ykdbonteregistry.azurecr.io/koala-activity-consumer-service:v1
             imagePullPolicy: Always
             ports:
               - containerPort: 5001
