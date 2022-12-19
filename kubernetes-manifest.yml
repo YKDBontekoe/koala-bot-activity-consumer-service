@@ -22,9 +22,6 @@ spec:
           - name: koala-activity-consumer-service
             image: ykdbonteregistry.azurecr.io/koala-activity-consumer-service:latest
             resources:
-              requests:
-                cpu: 500m
-                memory: 256Mi
               limits:
                 cpu: 1000m
                 memory: 500Mi
