@@ -5,5 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    working_dir: /app
     environment:
       - DOTNET_ENVIRONMENT=Development
