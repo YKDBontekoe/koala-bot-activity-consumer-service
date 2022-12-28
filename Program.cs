@@ -27,7 +27,7 @@ internal static class Program
                     builder
                         .SetBasePath(env.ContentRootPath)
                         .AddJsonFile("appsettings.json", true, true)
-                        .AddJsonFile($"appsettings.Development.json", true, true)
+                        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", true, true)
                         .AddEnvironmentVariables();
                 }
             )
