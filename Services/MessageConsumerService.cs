@@ -12,13 +12,13 @@ public class MessageConsumerService : IMessageConsumerService
 {
     private readonly ServiceBusClient _client;
     private ServiceBusProcessor? _processor;
-    private readonly IActivityRepository _activityRepository;
+    private readonly IActivityService _activityService;
     private readonly ServiceBusOptions _serviceBusOptions;
 
-    public MessageConsumerService(ServiceBusClient serviceBusClient, IActivityRepository activityRepository, IOptions<ServiceBusOptions> serviceBusOptions)
+    public MessageConsumerService(ServiceBusClient serviceBusClient, IOptions<ServiceBusOptions> serviceBusOptions, IActivityService activityService)
     {
         _client = serviceBusClient;
-        _activityRepository = activityRepository;
+        _activityService = activityService;
         _serviceBusOptions = serviceBusOptions.Value;
     }
 
@@ -61,7 +61,7 @@ public class MessageConsumerService : IMessageConsumerService
     {
         var body = args.Message.Body.ToString();
         var activity = JsonConvert.DeserializeObject<Activity>(body);
-        await _activityRepository.AddActivityAsync(activity);
+        await _activityService.AddActivityAsync(activity);
 
         // complete the message. message is deleted from the queue. 
         await args.CompleteMessageAsync(args.Message);

@@ -2,7 +2,7 @@
 
 namespace Koala.ActivityConsumerService.Repositories.Interfaces;
 
-public interface IActivityRepository
+public interface IActivityCosmosRepository
 {
     Task AddActivityAsync(Activity message);
 }
