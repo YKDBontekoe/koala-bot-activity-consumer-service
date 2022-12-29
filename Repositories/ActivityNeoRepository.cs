@@ -18,13 +18,14 @@ public class ActivityNeoRepository : IActivityNeoRepository
     {
         await CreateOrUpdateUserNode(activity);
         
+        await CreateOrUpdateGuildNode(activity);
+        
         if (!string.IsNullOrEmpty(activity.Name))
         {
             await CreateOrUpdateActivityTypeNode(activity);
 
             if (activity.SpotifyInfo != null)
             {
-                await CreateOrUpdateActivityNode(activity);
                 await CreateOrUpdateSpotifyAlbumNode(activity);
                 await CreateOrUpdateSpotifyArtistNodes(activity);
             }
@@ -32,6 +33,7 @@ public class ActivityNeoRepository : IActivityNeoRepository
             {
                 await CreateOrUpdateActivityNode(activity);
             }
+            await CreateOrUpdateActivityNode(activity);
         }
     }
 
@@ -51,6 +53,38 @@ public class ActivityNeoRepository : IActivityNeoRepository
             })
             .ExecuteWithoutResultsAsync();
     }
+    
+    private async Task CreateOrUpdateGuildNode(Activity activity)
+    {
+        if (activity.User.Guilds is null || !activity.User.Guilds.Any())
+        {
+            return;
+        }
+        
+        foreach (var guild in activity.User.Guilds)
+        {
+            await _client.Cypher
+                .Merge("(g:Guild {name: $name})")
+                .OnCreate()
+                .Set("g = $guild")
+                .WithParams(new
+                {
+                    name = guild.Name,
+                    guild = new GuildEntity()
+                    {
+                        Name = guild.Name
+                    }
+                })
+                .ExecuteWithoutResultsAsync();
+            
+            await _client.Cypher
+                .Match("(u:User)", "(g:Guild)")
+                .Where((UserEntity u) => u.UserName == activity.User.Username)
+                .AndWhere((GuildEntity g) => g.Name == guild.Name)
+                .Merge("(u)-[:MEMBER_OF]->(g)")
+                .ExecuteWithoutResultsAsync();
+        }
+    }
 
     private async Task CreateOrUpdateActivityTypeNode(Activity activity)
     {
@@ -66,13 +100,6 @@ public class ActivityNeoRepository : IActivityNeoRepository
                     Type = activity.Type,
                 }
             })
-            .ExecuteWithoutResultsAsync();
-        
-        await _client.Cypher
-            .Match("(u:User)", "(a:ActivityType)")
-            .Where((UserEntity u) => u.UserName == activity.User.Username)
-            .AndWhere((ActivityTypeEntity a) => a.Type == activity.Type)
-            .Merge("(u)-[:ACTIVITY_TYPE]->(a)")
             .ExecuteWithoutResultsAsync();
     }
 
@@ -147,15 +174,15 @@ public class ActivityNeoRepository : IActivityNeoRepository
         
         await _client.Cypher
             .Match("(a:Activity)", "(sa:SpotifyAlbum)")
-            .Where((ActivityEntity a) => a.Name == activity.Name)
+            .Where((ActivityEntity a) => a.Name == activity.SpotifyInfo.Track)
             .AndWhere((AlbumEntity sa) => sa.Name == activity.SpotifyInfo.Album)
-            .Merge("(a)-[:HAS_ALBUM]->(sa)")
+            .Merge("(a)-[:IS_FROM_ALBUM]->(sa)")
             .ExecuteWithoutResultsAsync();
     }
 
     private async Task CreateOrUpdateSpotifyArtistNodes(Activity activity)
     {
-        activity.SpotifyInfo.Artists.Select(async artist =>
+        foreach (var artist in activity.SpotifyInfo.Artists)
         {
             await _client.Cypher
                 .Merge("(a:SpotifyArtist {name: $name})")
@@ -172,13 +199,11 @@ public class ActivityNeoRepository : IActivityNeoRepository
                 .ExecuteWithoutResultsAsync();
             
             await _client.Cypher
-                .Match("(spa:SpotifyAlbum)", "(sa:SpotifyArtist)", "(a:Activity)")
-                .Where((TrackEntity a) => a.Name == activity.Name)
+                .Match("(sa:SpotifyArtist)", "(a:Activity)")
+                .Where((ActivityEntity a) => a.Name == activity.SpotifyInfo.Track)
                 .AndWhere((ArtistEntity sa) => artist == sa.Name)
-                .AndWhere((AlbumEntity spa) => spa.Name == activity.SpotifyInfo.Album)
                 .Merge("(a)-[:HAS_ARTIST]->(sa)")
-                .Merge("(sa)-[:IS_FROM_ALBUM]->(spa)")
                 .ExecuteWithoutResultsAsync();
-        });
+        }
     }
 }
