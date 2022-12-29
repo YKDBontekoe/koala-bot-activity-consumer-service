@@ -28,6 +28,9 @@ jobs:
               env:
                 ServiceBus.ConnectionString: ${{ secrets.SERVICE_BUS_CONNECTION_STRING }}
                 CosmosDb.ConnectionString: ${{ secrets.COSMOSDB_CONNECTION_STRING }}
+                Neo4jDb.Uri: ${{ secrets.NEO4J_URI }}
+                Neo4jDb.Username: ${{ secrets.NEO4J_USERNAME }}
+                Neo4jDb.Password: ${{ secrets.NEO4J_PASSWORD }}
             - uses: azure/login@v1.4.3
               name: Azure login
               with:
