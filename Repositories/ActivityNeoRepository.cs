@@ -96,7 +96,7 @@ public class ActivityNeoRepository : IActivityNeoRepository
                 .WithParams(new
                 {
                     name = activity.SpotifyInfo?.Track.Name,
-                    song = new ActivityEntity
+                    song = new SongEntity
                     {
                         Name = activity.SpotifyInfo?.Track.Name
                     }
@@ -106,7 +106,7 @@ public class ActivityNeoRepository : IActivityNeoRepository
             await _client.Cypher
                 .Match("(u:User)", "(s:Song)")
                 .Where((UserEntity u) => u.UserName == activity.User.Username)
-                .AndWhere((TrackEntity s) => s.Name == activity.SpotifyInfo.Track.Name)
+                .AndWhere((SongEntity s) => s.Name == activity.SpotifyInfo.Track.Name)
                 .Merge("(u)-[:IS_LISTENING]->(s)")
                 .ExecuteWithoutResultsAsync();
         }
@@ -154,10 +154,10 @@ public class ActivityNeoRepository : IActivityNeoRepository
             .ExecuteWithoutResultsAsync();
         
         await _client.Cypher
-            .Match("(s:Song)", "(sa:SpotifyAlbum)")
-            .Where((ActivityEntity s) => s.Name == activity.SpotifyInfo.Track.Name)
-            .AndWhere((AlbumEntity sa) => sa.Name == activity.SpotifyInfo.Track.Album.Name)
-            .Merge("(s)-[:IS_FROM_ALBUM]->(sa)")
+            .Match("(s:Song)", "(a:Album)")
+            .Where((SongEntity s) => s.Name == activity.SpotifyInfo.Track.Name)
+            .AndWhere((AlbumEntity a) => a.Name == activity.SpotifyInfo.Track.Album.Name)
+            .Merge("(s)-[:IS_FROM_ALBUM]->(a)")
             .ExecuteWithoutResultsAsync();
     }
 
