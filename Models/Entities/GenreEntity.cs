@@ -1,9 +1,9 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Koala.ActivityConsumerService.Models.Entities;
 
-public class ActivityEntity
+public class GenreEntity
 {
     [JsonProperty(PropertyName = "name")]
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; set; }
 }
