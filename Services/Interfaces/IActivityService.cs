@@ -1,4 +1,5 @@
 ﻿using Koala.ActivityConsumerService.Models;
+using Koala.ActivityConsumerService.Models.Activities;
 
 namespace Koala.ActivityConsumerService.Services.Interfaces;
 

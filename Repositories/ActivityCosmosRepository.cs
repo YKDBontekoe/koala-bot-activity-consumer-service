@@ -1,4 +1,5 @@
 ﻿using Koala.ActivityConsumerService.Models;
+using Koala.ActivityConsumerService.Models.Activities;
 using Koala.ActivityConsumerService.Options;
 using Koala.ActivityConsumerService.Repositories.Interfaces;
 using Microsoft.Azure.Cosmos;

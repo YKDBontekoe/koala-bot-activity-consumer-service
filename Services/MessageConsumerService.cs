@@ -1,8 +1,12 @@
 ﻿using Azure.Messaging.ServiceBus;
+using Koala.ActivityConsumerService.Constants;
 using Koala.ActivityConsumerService.Models;
+using Koala.ActivityConsumerService.Models.Activities;
 using Koala.ActivityConsumerService.Options;
 using Koala.ActivityConsumerService.Repositories.Interfaces;
 using Koala.ActivityConsumerService.Services.Interfaces;
+using Koala.ActivityConsumerService.Services.Strategies;
+using Koala.ActivityConsumerService.Services.Strategies.Interfaces;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -14,12 +18,20 @@ public class MessageConsumerService : IMessageConsumerService
     private ServiceBusProcessor? _processor;
     private readonly IActivityService _activityService;
     private readonly ServiceBusOptions _serviceBusOptions;
+    private readonly Dictionary<string, IActivityDeserializationStrategy> _deserializationStrategies;
 
     public MessageConsumerService(ServiceBusClient serviceBusClient, IOptions<ServiceBusOptions> serviceBusOptions, IActivityService activityService)
     {
         _client = serviceBusClient;
         _activityService = activityService;
         _serviceBusOptions = serviceBusOptions.Value;
+        
+        _deserializationStrategies = new Dictionary<string, IActivityDeserializationStrategy>
+        {
+            { MessageTypes.Listening, new SpotifyActivityDeserializationStrategy() },
+            { MessageTypes.Playing, new GameActivityDeserializationStrategy() },
+            { MessageTypes.Streaming, new StreamingActivityDeserializationStrategy() }
+        };
     }
 
     public async Task RegisterOnMessageHandlerAndReceiveMessages()
@@ -61,10 +73,15 @@ public class MessageConsumerService : IMessageConsumerService
     {
         var body = args.Message.Body.ToString();
         var activity = JsonConvert.DeserializeObject<Activity>(body);
-        await _activityService.AddActivityAsync(activity);
-
-        // complete the message. message is deleted from the queue. 
-        await args.CompleteMessageAsync(args.Message);
+        ArgumentNullException.ThrowIfNull(activity);
+        
+        if (_deserializationStrategies.TryGetValue(activity.Type, out var deserializationStrategy))
+        {
+            activity = deserializationStrategy.Deserialize(body);
+            
+            ArgumentNullException.ThrowIfNull(activity);
+            await _activityService.AddActivityAsync(activity);
+        }
     }
 
 // handle any errors when receiving messages
