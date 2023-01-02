@@ -15,7 +15,9 @@ namespace Koala.ActivityConsumerService.Services;
 public class MessageConsumerService : IMessageConsumerService
 {
     private readonly ServiceBusClient _client;
-    private ServiceBusProcessor? _processor;
+    private ServiceBusProcessor? _musicProcessor;
+    private ServiceBusProcessor? _gameProcessor;
+    private ServiceBusProcessor? _activityProcessor;
     private readonly IActivityService _activityService;
     private readonly ServiceBusOptions _serviceBusOptions;
     private readonly Dictionary<string, IActivityDeserializationStrategy> _deserializationStrategies;
@@ -36,21 +38,33 @@ public class MessageConsumerService : IMessageConsumerService
 
     public async Task RegisterOnMessageHandlerAndReceiveMessages()
     {
-        _processor = _client.CreateProcessor(_serviceBusOptions.QueueName, new ServiceBusProcessorOptions
+        var serviceBusOptions = new ServiceBusProcessorOptions
         {
             AutoCompleteMessages = true,
             MaxAutoLockRenewalDuration = TimeSpan.FromMinutes(15),
             PrefetchCount = 100,
-        });
+        };
+        
+        _musicProcessor = _client.CreateProcessor(_serviceBusOptions.MusicQueueName, serviceBusOptions);
+        _gameProcessor = _client.CreateProcessor(_serviceBusOptions.GameQueueName, serviceBusOptions);
+        _activityProcessor = _client.CreateProcessor(_serviceBusOptions.ActivitiesQueueName, serviceBusOptions);
         
         try
         {
             // add handler to process messages
-            _processor.ProcessMessageAsync += MessageHandler;
+            _musicProcessor.ProcessMessageAsync += MusicMessageHandler;
+            _gameProcessor.ProcessMessageAsync += GameMessageHandler;
+            _activityProcessor.ProcessMessageAsync += ActivitiesMessageHandler;
 
             // add handler to process any errors
-            _processor.ProcessErrorAsync += ErrorHandler;
-            await _processor.StartProcessingAsync();
+            _musicProcessor.ProcessErrorAsync += ErrorHandler;
+            _gameProcessor.ProcessErrorAsync += ErrorHandler;
+            _activityProcessor.ProcessErrorAsync += ErrorHandler;
+            
+            // Start processing
+            await _musicProcessor.StartProcessingAsync();
+            await _gameProcessor.StartProcessingAsync();
+            await _activityProcessor.StartProcessingAsync();
         }
         catch (Exception ex)
         {
@@ -60,16 +74,35 @@ public class MessageConsumerService : IMessageConsumerService
 
     public async Task CloseQueueAsync()
     {
-        if (_processor != null) await _processor.CloseAsync();
+        if (_gameProcessor != null) await _gameProcessor.CloseAsync();
+        if (_musicProcessor != null) await _musicProcessor.CloseAsync();
     }
 
     public async Task DisposeAsync()
     {
-        if (_processor != null) await _processor.DisposeAsync();
+        if (_gameProcessor != null) await _gameProcessor.DisposeAsync();
+        if (_musicProcessor != null) await _musicProcessor.DisposeAsync();
     }
 
     // handle received messages
-    private async Task MessageHandler(ProcessMessageEventArgs args)
+    private async Task GameMessageHandler(ProcessMessageEventArgs args)
+    {
+        var body = args.Message.Body.ToString();
+        var activity = JsonConvert.DeserializeObject<Activity>(body);
+        ArgumentNullException.ThrowIfNull(activity);
+        
+        if (_deserializationStrategies.TryGetValue(activity.Type, out var deserializationStrategy))
+        {
+            activity = deserializationStrategy.Deserialize(body);
+            
+            ArgumentNullException.ThrowIfNull(activity);
+            await _activityService.AddActivityAsync(activity);
+        }
+    }
+    
+    
+    // handle received messages
+    private async Task MusicMessageHandler(ProcessMessageEventArgs args)
     {
         var body = args.Message.Body.ToString();
         var activity = JsonConvert.DeserializeObject<Activity>(body);
@@ -84,6 +117,22 @@ public class MessageConsumerService : IMessageConsumerService
         }
     }
 
+    // handle received messages
+    private async Task ActivitiesMessageHandler(ProcessMessageEventArgs args)
+    {
+        var body = args.Message.Body.ToString();
+        var activity = JsonConvert.DeserializeObject<Activity>(body);
+        ArgumentNullException.ThrowIfNull(activity);
+        
+        if (_deserializationStrategies.TryGetValue(activity.Type, out var deserializationStrategy))
+        {
+            activity = deserializationStrategy.Deserialize(body);
+            
+            ArgumentNullException.ThrowIfNull(activity);
+            await _activityService.AddActivityAsync(activity);
+        }
+    }
+    
 // handle any errors when receiving messages
     private static Task ErrorHandler(ProcessErrorEventArgs args)
     {

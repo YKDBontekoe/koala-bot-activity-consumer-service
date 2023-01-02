@@ -6,5 +6,7 @@ public class ServiceBusOptions
     
     public string ConnectionString { get; set; }
     
-    public string QueueName { get; set; }
+    public string MusicQueueName { get; set; }
+    public string ActivitiesQueueName { get; set; }
+    public string GameQueueName { get; set; }
 }
