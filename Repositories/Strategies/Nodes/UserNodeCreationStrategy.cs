@@ -17,16 +17,15 @@ public class UserNodeCreationStrategy : INodeCreationStrategy
     public async Task CreateNode(Activity activity)
     {
         await _client.Cypher
-            .Merge("(u:User {id: $id})")
+            .Merge("(u:User {userName: $userName})")
             .OnCreate()
             .Set("u = $user")
             .WithParams(new
             {
-                id = activity.User.Id.ToString(),
-                user = new UserEntity()
+                userName = activity.User.Username,
+                user = new UserEntity
                 {
-                    UserName = activity.User.Username,
-                    Id = activity.User.Id.ToString(),
+                    UserName = activity.User.Username
                 }
             })
             .ExecuteWithoutResultsAsync();

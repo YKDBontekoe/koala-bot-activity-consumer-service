@@ -26,7 +26,7 @@ public class UserToGuildRelationshipCreationStrategy : IRelationshipCreationStra
         {
             await _client.Cypher
                 .Match("(u:User)", "(g:Guild)")
-                .Where((UserEntity u) => u.Id == activity.User.Id.ToString())
+                .Where((UserEntity u) => u.UserName == activity.User.Username)
                 .AndWhere((GuildEntity g) => g.Name == guild.Name)
                 .Merge("(u)-[:MEMBER_OF]->(g)")
                 .ExecuteWithoutResultsAsync();

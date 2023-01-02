@@ -24,15 +24,8 @@ public class ActivityNeoRepository : IActivityNeoRepository
         var nodes = GetNodes();
         var relationships = GetRelationships();
         
-        foreach (var node in nodes)
-        {
-            await node.CreateNode(activity);
-        }
-        
-        foreach (var relationship in relationships)
-        {
-            await relationship.CreateRelationship(activity);
-        }
+        await Task.WhenAll(nodes.Select(x => x.CreateNode(activity)));
+        await Task.WhenAll(relationships.Select(x => x.CreateRelationship(activity)));
     }
     
     private IEnumerable<INodeCreationStrategy> GetNodes() =>
