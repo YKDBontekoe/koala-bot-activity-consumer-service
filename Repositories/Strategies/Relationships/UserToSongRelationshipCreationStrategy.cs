@@ -25,7 +25,7 @@ public class UserToSongRelationshipCreationStrategy : IRelationshipCreationStrat
         var spotifyActivity = (SpotifyActivity)activity;
         await _client.Cypher
             .Match("(u:User)", "(s:Song)")
-            .Where((UserEntity u) => u.Id == activity.User.Id.ToString())
+            .Where((UserEntity u) => u.UserName == activity.User.Username)
             .AndWhere((SongEntity s) => s.Name == spotifyActivity.SpotifyInfo.Track.Name)
             .Merge("(u)-[:IS_LISTENING]->(s)")
             .ExecuteWithoutResultsAsync();
