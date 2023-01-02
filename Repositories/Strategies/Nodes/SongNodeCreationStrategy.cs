@@ -29,7 +29,7 @@ public class SongNodeCreationStrategy : INodeCreationStrategy
             .Set("s = $song")
             .WithParams(new
             {
-                name = activity.Name,
+                name = spotifyActivity.SpotifyInfo.Track.Name,
                 song = new SongEntity
                 {
                     Name = spotifyActivity.SpotifyInfo.Track.Name

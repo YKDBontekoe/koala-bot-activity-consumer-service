@@ -25,7 +25,7 @@ public class UserToGameRelationshipCreationStrategy : IRelationshipCreationStrat
         var gameActivity = (GameActivity)activity;
         await _client.Cypher
             .Match("(u:User)", "(g:Game)")
-            .Where((UserEntity u) => u.Id == activity.User.Id.ToString())
+            .Where((UserEntity u) => u.UserName == activity.User.Username)
             .AndWhere((GameEntity a) => a.Id == gameActivity.GameInfo.ApplicationId.ToString())
             .Merge("(u)-[:IS_PLAYING]->(g)")
             .ExecuteWithoutResultsAsync();
