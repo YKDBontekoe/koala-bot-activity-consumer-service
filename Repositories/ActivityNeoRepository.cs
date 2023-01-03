@@ -35,24 +35,18 @@ public class ActivityNeoRepository : IActivityNeoRepository
             case SpotifyActivity spotifyActivity:
             {
                 foreach (var spotifyNode in spotifyNodes) await spotifyNode.CreateNode(spotifyActivity);
-
-                foreach (var spotifyRelationship in spotifyRelationships)
-                    await spotifyRelationship.CreateRelationship(spotifyActivity);
-
+                foreach (var spotifyRelationship in spotifyRelationships) await spotifyRelationship.CreateRelationship(spotifyActivity);
                 break;
             }
             case GameActivity gameActivity:
             {
                 foreach (var gameNode in gameNodes) await gameNode.CreateNode(gameActivity);
-
                 foreach (var gameRelations in gameRelationships) await gameRelations.CreateRelationship(gameActivity);
-
                 break;
             }
         }
 
         foreach (var otherNode in otherNodes) await otherNode.CreateNode(activity);
-
         foreach (var otherRelationship in otherRelationships) await otherRelationship.CreateRelationship(activity);
     }
 

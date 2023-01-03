@@ -4,5 +4,5 @@ namespace Koala.ActivityConsumerService.Services.Interfaces;
 
 public interface IActivityService
 {
-    Task AddActivityAsync(Activity activity);
+    Task AddActivityAsync<T>(T activity) where T : Activity;
 }

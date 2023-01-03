@@ -19,9 +19,9 @@ public class ActivityCosmosRepository : IActivityCosmosRepository
         _database = new CosmosClient(_options.ConnectionString);
     }
 
-    public async Task AddActivityAsync(Activity activity)
+    public async Task AddActivityAsync<T>(T activity) where T : Activity
     {
         var container = _database.GetContainer(_options.DatabaseName, _options.ContainerName);
-        await container.UpsertItemAsync(activity);
+        await container.CreateItemAsync(activity);
     }
 }

@@ -16,7 +16,7 @@ public class ActivityService : IActivityService
         _activityCosmosRepository = activityCosmosRepository;
     }
 
-    public async Task AddActivityAsync(Activity activity)
+    public async Task AddActivityAsync<T>(T activity) where T : Activity
     {
         // Add to Neo4j
         await _activityNeoRepository.GenerateRelationships(activity);
