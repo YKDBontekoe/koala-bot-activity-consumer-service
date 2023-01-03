@@ -5,7 +5,7 @@ using Neo4jClient;
 
 namespace Koala.ActivityConsumerService.Repositories.Strategies.Nodes;
 
-public class GuildNodeCreationStrategy : INodeCreationStrategy
+public class GuildNodeCreationStrategy : INodeCreationStrategy<Activity>
 {
     private readonly IBoltGraphClient _client;
 
@@ -16,8 +16,7 @@ public class GuildNodeCreationStrategy : INodeCreationStrategy
 
     public async Task CreateNode(Activity activity)
     {
-        var spotifyActivity = (SpotifyActivity)activity;
-        if (spotifyActivity.User.Guilds is null)
+        if (!IsActivityValid(activity))
         {
             return;
         }
@@ -38,5 +37,10 @@ public class GuildNodeCreationStrategy : INodeCreationStrategy
                 })
                 .ExecuteWithoutResultsAsync();
         }
+    }
+
+    public bool IsActivityValid(Activity activity)
+    {
+        return activity.User.Guilds is not null;
     }
 }

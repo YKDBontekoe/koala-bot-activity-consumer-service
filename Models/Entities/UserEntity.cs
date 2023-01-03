@@ -1,12 +1,7 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Koala.ActivityConsumerService.Models.Entities;
 
-public class UserEntity
+public class UserEntity : NeoEntity
 {
-    [JsonProperty(PropertyName = "userName")]
-    public string UserName { get; set; }
-
-    [JsonProperty(PropertyName = "id")]
-    public string Id { get; set; }
 }

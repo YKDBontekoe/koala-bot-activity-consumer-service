@@ -2,8 +2,6 @@
 
 namespace Koala.ActivityConsumerService.Models.Entities;
 
-public class SongEntity
+public class SongEntity : NeoEntity
 {
-    [JsonProperty(PropertyName = "name")]
-    public string Name { get; set; } = string.Empty;
 }

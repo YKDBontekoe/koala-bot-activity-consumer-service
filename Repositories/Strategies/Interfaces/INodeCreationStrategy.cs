@@ -2,7 +2,7 @@
 
 namespace Koala.ActivityConsumerService.Repositories.Strategies.Interfaces;
 
-public interface INodeCreationStrategy
+public interface INodeCreationStrategy<in T> : INeoStrategy<T> where T : Activity
 {
-    Task CreateNode(Activity activity);
+    Task CreateNode(T activity);
 }
