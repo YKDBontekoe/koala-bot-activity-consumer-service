@@ -5,7 +5,7 @@ using Neo4jClient;
 
 namespace Koala.ActivityConsumerService.Repositories.Strategies.Nodes;
 
-public class GuildNodeCreationStrategy : INodeCreationStrategy
+public class GuildNodeCreationStrategy : INodeCreationStrategy<Activity>
 {
     private readonly IBoltGraphClient _client;
 
@@ -16,14 +16,9 @@ public class GuildNodeCreationStrategy : INodeCreationStrategy
 
     public async Task CreateNode(Activity activity)
     {
-        var spotifyActivity = (SpotifyActivity)activity;
-        if (spotifyActivity.User.Guilds is null)
-        {
-            return;
-        }
-        
+        if (!IsActivityValid(activity)) return;
+
         foreach (var guild in activity.User.Guilds)
-        {
             await _client.Cypher
                 .Merge("(g:Guild {name: $name})")
                 .OnCreate()
@@ -31,12 +26,16 @@ public class GuildNodeCreationStrategy : INodeCreationStrategy
                 .WithParams(new
                 {
                     name = guild.Name,
-                    guild = new GuildEntity()
+                    guild = new GuildEntity
                     {
                         Name = guild.Name
                     }
                 })
                 .ExecuteWithoutResultsAsync();
-        }
+    }
+
+    public bool IsActivityValid(Activity activity)
+    {
+        return activity.User.Guilds is not null;
     }
 }

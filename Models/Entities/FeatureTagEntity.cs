@@ -1,5 +1,5 @@
 ﻿namespace Koala.ActivityConsumerService.Models.Entities;
 
-public class ArtistEntity : NeoEntity
+public class FeatureTagEntity : NeoEntity
 {
 }

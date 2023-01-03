@@ -2,7 +2,7 @@
 
 namespace Koala.ActivityConsumerService.Repositories.Strategies.Interfaces;
 
-public interface IRelationshipCreationStrategy
+public interface IRelationshipCreationStrategy<in T> : INeoStrategy<T> where T : Activity
 {
-    Task CreateRelationship(Activity activity);
+    Task CreateRelationship(T activity);
 }

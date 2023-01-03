@@ -23,7 +23,7 @@ internal static class Program
             .ConfigureAppConfiguration((context, builder) =>
                 {
                     var env = context.HostingEnvironment;
-                    
+
                     builder
                         .SetBasePath(env.ContentRootPath)
                         .AddJsonFile("appsettings.json", true, true)
@@ -65,10 +65,11 @@ internal static class Program
     {
         services.AddAzureClients(builder =>
         {
-            builder.AddServiceBusClient(services.BuildServiceProvider().GetRequiredService<IOptions<ServiceBusOptions>>().Value.ConnectionString);
+            builder.AddServiceBusClient(services.BuildServiceProvider()
+                .GetRequiredService<IOptions<ServiceBusOptions>>().Value.ConnectionString);
         });
     }
-    
+
     //Configure Neo4jClient with connection string and credentials
     private static void ConfigureNeo4JClient(IServiceCollection services)
     {
@@ -76,8 +77,10 @@ internal static class Program
         {
             // Get the necessary options from the service provider
             var options = services.BuildServiceProvider().GetRequiredService<IOptions<Neo4JDbOptions>>().Value;
-            
-            var driver = GraphDatabase.Driver(new Uri(options.Uri), AuthTokens.Basic(options.Username, options.Password), config => config.WithEncryptionLevel(EncryptionLevel.Encrypted));
+
+            var driver = GraphDatabase.Driver(new Uri(options.Uri),
+                AuthTokens.Basic(options.Username, options.Password),
+                config => config.WithEncryptionLevel(EncryptionLevel.Encrypted));
 
             // Initialize the neo4JClient object using the options
             var neo4JClient = new BoltGraphClient(driver);
@@ -93,7 +96,7 @@ internal static class Program
                 Console.WriteLine(e);
                 throw;
             }
-            
+
             return neo4JClient;
         }
 

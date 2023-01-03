@@ -1,5 +1,4 @@
-﻿using Koala.ActivityConsumerService.Models;
-using Koala.ActivityConsumerService.Models.Activities;
+﻿using Koala.ActivityConsumerService.Models.Activities;
 using Koala.ActivityConsumerService.Repositories.Interfaces;
 using Koala.ActivityConsumerService.Services.Interfaces;
 
@@ -7,10 +6,11 @@ namespace Koala.ActivityConsumerService.Services;
 
 public class ActivityService : IActivityService
 {
-    private readonly IActivityNeoRepository _activityNeoRepository;
     private readonly IActivityCosmosRepository _activityCosmosRepository;
+    private readonly IActivityNeoRepository _activityNeoRepository;
 
-    public ActivityService(IActivityNeoRepository activityNeoRepository, IActivityCosmosRepository activityCosmosRepository)
+    public ActivityService(IActivityNeoRepository activityNeoRepository,
+        IActivityCosmosRepository activityCosmosRepository)
     {
         _activityNeoRepository = activityNeoRepository;
         _activityCosmosRepository = activityCosmosRepository;
@@ -20,7 +20,7 @@ public class ActivityService : IActivityService
     {
         // Add to Neo4j
         await _activityNeoRepository.GenerateRelationships(activity);
-        
+
         // Add to CosmosDB
         await _activityCosmosRepository.AddActivityAsync(activity);
     }

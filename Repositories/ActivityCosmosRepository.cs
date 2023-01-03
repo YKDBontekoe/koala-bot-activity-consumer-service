@@ -1,5 +1,4 @@
-﻿using Koala.ActivityConsumerService.Models;
-using Koala.ActivityConsumerService.Models.Activities;
+﻿using Koala.ActivityConsumerService.Models.Activities;
 using Koala.ActivityConsumerService.Options;
 using Koala.ActivityConsumerService.Repositories.Interfaces;
 using Microsoft.Azure.Cosmos;
@@ -14,7 +13,9 @@ public class ActivityCosmosRepository : IActivityCosmosRepository
 
     public ActivityCosmosRepository(IOptions<CosmosDbOptions> cosmosDbOptions)
     {
-        _options = cosmosDbOptions != null ? cosmosDbOptions.Value : throw new ArgumentNullException(nameof(cosmosDbOptions));
+        _options = cosmosDbOptions != null
+            ? cosmosDbOptions.Value
+            : throw new ArgumentNullException(nameof(cosmosDbOptions));
         _database = new CosmosClient(_options.ConnectionString);
     }
 

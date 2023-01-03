@@ -1,9 +1,5 @@
-using Newtonsoft.Json;
+﻿namespace Koala.ActivityConsumerService.Models.Entities;
 
-namespace Koala.ActivityConsumerService.Models.Entities;
-
-public class AlbumEntity
+public class AlbumEntity : NeoEntity
 {
-    [JsonProperty(PropertyName = "name")]
-    public string Name { get; set; }
 }

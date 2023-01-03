@@ -1,12 +1,5 @@
-using Newtonsoft.Json;
+﻿namespace Koala.ActivityConsumerService.Models.Entities;
 
-namespace Koala.ActivityConsumerService.Models.Entities;
-
-public class GameEntity
+public class GameEntity : NeoEntity
 {
-    [JsonProperty(PropertyName = "name")]
-    public string Name { get; set; } = string.Empty;
-    
-    [JsonProperty(PropertyName = "id")]
-    public string Id { get; set; } = string.Empty;
 }

@@ -3,33 +3,33 @@ kind: Deployment
 metadata:
   name: koala-activity-consumer-service
 spec:
-    replicas: 1
-    strategy:
-      type: RollingUpdate
-      rollingUpdate:
-        maxSurge: 1
-        maxUnavailable: 1
-    selector:
-        matchLabels:
-          app: koala-activity-consumer-service
-    template:
-        metadata:
-          labels:
-            app: koala-activity-consumer-service
-        spec:
-          restartPolicy: Always
-          containers:
-          - name: koala-activity-consumer-service
-            image: ykdbonteregistry.azurecr.io/koala-activity-consumer-service:latest
-            resources:
-              limits:
-                cpu: 100m
-                memory: 500Mi
-            imagePullPolicy: Always
-            ports:
-              - containerPort: 5001
-            env:
-              - name: DOTNET_ENVIRONMENT
-                value: "Production"
-          imagePullSecrets:
-            - name: ykdbonteregistry
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: koala-activity-consumer-service
+  template:
+    metadata:
+      labels:
+        app: koala-activity-consumer-service
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: koala-activity-consumer-service
+          image: ykdbonteregistry.azurecr.io/koala-activity-consumer-service:latest
+          resources:
+            limits:
+              cpu: 100m
+              memory: 500Mi
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5001
+          env:
+            - name: DOTNET_ENVIRONMENT
+              value: "Production"
+      imagePullSecrets:
+        - name: ykdbonteregistry

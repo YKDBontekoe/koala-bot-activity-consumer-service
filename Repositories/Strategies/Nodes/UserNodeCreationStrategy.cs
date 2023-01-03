@@ -5,7 +5,7 @@ using Neo4jClient;
 
 namespace Koala.ActivityConsumerService.Repositories.Strategies.Nodes;
 
-public class UserNodeCreationStrategy : INodeCreationStrategy
+public class UserNodeCreationStrategy : INodeCreationStrategy<Activity>
 {
     private readonly IBoltGraphClient _client;
 
@@ -17,17 +17,22 @@ public class UserNodeCreationStrategy : INodeCreationStrategy
     public async Task CreateNode(Activity activity)
     {
         await _client.Cypher
-            .Merge("(u:User {userName: $userName})")
+            .Merge("(u:User {name: $name})")
             .OnCreate()
             .Set("u = $user")
             .WithParams(new
             {
-                userName = activity.User.Username,
+                name = activity.User.Username,
                 user = new UserEntity
                 {
-                    UserName = activity.User.Username
+                    Name = activity.User.Username
                 }
             })
             .ExecuteWithoutResultsAsync();
+    }
+
+    public bool IsActivityValid(Activity activity)
+    {
+        throw new NotImplementedException();
     }
 }
