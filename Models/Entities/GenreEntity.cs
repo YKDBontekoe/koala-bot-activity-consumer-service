@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace Koala.ActivityConsumerService.Models.Entities;
+﻿namespace Koala.ActivityConsumerService.Models.Entities;
 
 public class GenreEntity : NeoEntity
 {

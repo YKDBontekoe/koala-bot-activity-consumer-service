@@ -2,5 +2,5 @@
 
 public interface INeoStrategy<in T> where T : class
 {
-    bool IsActivityValid(T activity); 
+    bool IsActivityValid(T activity);
 }

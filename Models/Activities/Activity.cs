@@ -6,5 +6,5 @@ public class Activity
     public required string Type { get; init; } = string.Empty;
     public required DateTimeOffset StartedAt { get; init; } = DateTimeOffset.Now;
     public string Details { get; init; } = string.Empty;
-    public required User User { get; init; } = new ();
+    public required User User { get; init; } = new();
 }

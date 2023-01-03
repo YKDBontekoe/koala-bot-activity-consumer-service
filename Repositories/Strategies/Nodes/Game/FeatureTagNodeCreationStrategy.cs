@@ -12,14 +12,10 @@ public class FeatureTagNodeCreationStrategy : BaseGameNodeCreationStrategy
 
     public override async Task CreateNode(GameActivity activity)
     {
-        if (!IsActivityValid(activity))
-        {
-            return;
-        }
-        
-        
+        if (!IsActivityValid(activity)) return;
+
+
         foreach (var tag in activity.GameInfo.Tags)
-        {
             await Client.Cypher
                 .Merge("(d:Feature {name: $name})")
                 .OnCreate()
@@ -33,6 +29,5 @@ public class FeatureTagNodeCreationStrategy : BaseGameNodeCreationStrategy
                     }
                 })
                 .ExecuteWithoutResultsAsync();
-        }
     }
 }

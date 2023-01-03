@@ -1,7 +1,5 @@
-﻿using Koala.ActivityConsumerService.Constants;
-using Koala.ActivityConsumerService.Models.Activities;
+﻿using Koala.ActivityConsumerService.Models.Activities;
 using Koala.ActivityConsumerService.Models.Entities;
-using Koala.ActivityConsumerService.Repositories.Strategies.Interfaces;
 using Neo4jClient;
 
 namespace Koala.ActivityConsumerService.Repositories.Strategies.Relationships.Spotify;
@@ -14,11 +12,8 @@ public class UserToSongRelationshipCreationStrategy : BaseSpotifyRelationshipCre
 
     public override async Task CreateRelationship(SpotifyActivity activity)
     {
-        if (!IsActivityValid(activity))
-        {
-            return;
-        }
-        
+        if (!IsActivityValid(activity)) return;
+
         await Client.Cypher
             .Match("(u:User)", "(s:Song)")
             .Where((UserEntity u) => u.Name == activity.User.Username)

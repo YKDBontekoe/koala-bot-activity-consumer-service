@@ -1,9 +1,6 @@
 ﻿using Azure.Messaging.ServiceBus;
-using Koala.ActivityConsumerService.Constants;
-using Koala.ActivityConsumerService.Models;
 using Koala.ActivityConsumerService.Models.Activities;
 using Koala.ActivityConsumerService.Options;
-using Koala.ActivityConsumerService.Repositories.Interfaces;
 using Koala.ActivityConsumerService.Services.Interfaces;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -12,14 +9,15 @@ namespace Koala.ActivityConsumerService.Services;
 
 public class MessageConsumerService : IMessageConsumerService
 {
-    private readonly ServiceBusClient _client;
-    private ServiceBusProcessor? _musicProcessor;
-    private ServiceBusProcessor? _gameProcessor;
-    private ServiceBusProcessor? _activityProcessor;
     private readonly IActivityService _activityService;
+    private readonly ServiceBusClient _client;
     private readonly ServiceBusOptions _serviceBusOptions;
+    private ServiceBusProcessor? _activityProcessor;
+    private ServiceBusProcessor? _gameProcessor;
+    private ServiceBusProcessor? _musicProcessor;
 
-    public MessageConsumerService(ServiceBusClient serviceBusClient, IOptions<ServiceBusOptions> serviceBusOptions, IActivityService activityService)
+    public MessageConsumerService(ServiceBusClient serviceBusClient, IOptions<ServiceBusOptions> serviceBusOptions,
+        IActivityService activityService)
     {
         _client = serviceBusClient;
         _activityService = activityService;
@@ -32,13 +30,13 @@ public class MessageConsumerService : IMessageConsumerService
         {
             AutoCompleteMessages = true,
             MaxAutoLockRenewalDuration = TimeSpan.FromMinutes(15),
-            PrefetchCount = 100,
+            PrefetchCount = 100
         };
-        
+
         _musicProcessor = _client.CreateProcessor(_serviceBusOptions.MusicQueueName, serviceBusOptions);
         _gameProcessor = _client.CreateProcessor(_serviceBusOptions.GameQueueName, serviceBusOptions);
         _activityProcessor = _client.CreateProcessor(_serviceBusOptions.ActivitiesQueueName, serviceBusOptions);
-        
+
         try
         {
             // add handler to process messages
@@ -50,7 +48,7 @@ public class MessageConsumerService : IMessageConsumerService
             _musicProcessor.ProcessErrorAsync += ErrorHandler;
             _gameProcessor.ProcessErrorAsync += ErrorHandler;
             _activityProcessor.ProcessErrorAsync += ErrorHandler;
-            
+
             // Start processing
             await _musicProcessor.StartProcessingAsync();
             await _gameProcessor.StartProcessingAsync();
@@ -80,18 +78,18 @@ public class MessageConsumerService : IMessageConsumerService
         var body = args.Message.Body.ToString();
         var activity = JsonConvert.DeserializeObject<GameActivity>(body);
         ArgumentNullException.ThrowIfNull(activity);
-        
+
         await _activityService.AddActivityAsync(activity);
     }
-    
-    
+
+
     // handle received messages
     private async Task MusicMessageHandler(ProcessMessageEventArgs args)
     {
         var body = args.Message.Body.ToString();
         var activity = JsonConvert.DeserializeObject<SpotifyActivity>(body);
         ArgumentNullException.ThrowIfNull(activity);
-        
+
         await _activityService.AddActivityAsync(activity);
     }
 
@@ -101,10 +99,10 @@ public class MessageConsumerService : IMessageConsumerService
         var body = args.Message.Body.ToString();
         var activity = JsonConvert.DeserializeObject<Activity>(body);
         ArgumentNullException.ThrowIfNull(activity);
-        
+
         await _activityService.AddActivityAsync(activity);
     }
-    
+
     // handle any errors when receiving messages
     private static Task ErrorHandler(ProcessErrorEventArgs args)
     {

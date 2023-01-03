@@ -12,11 +12,8 @@ public class GameToAllTimeReviewScoreRelationshipCreationStrategy : BaseGameRela
 
     public override async Task CreateRelationship(GameActivity activity)
     {
-        if (!IsActivityValid(activity))
-        {
-            return;
-        }
-        
+        if (!IsActivityValid(activity)) return;
+
         await Client.Cypher
             .Match("(rs:ReviewScore)", "(g:Game)")
             .Where((ReviewScoreEntity rs) => rs.Name == activity.GameInfo.AllTimeReviewScore)

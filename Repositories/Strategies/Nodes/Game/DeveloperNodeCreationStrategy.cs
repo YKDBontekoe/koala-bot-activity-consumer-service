@@ -12,13 +12,9 @@ public class DeveloperNodeCreationStrategy : BaseGameNodeCreationStrategy
 
     public override async Task CreateNode(GameActivity activity)
     {
-        if (!IsActivityValid(activity))
-        {
-            return;
-        }
-        
+        if (!IsActivityValid(activity)) return;
+
         foreach (var developer in activity.GameInfo.Developers)
-        {
             await Client.Cypher
                 .Merge("(d:Developer {name: $name})")
                 .OnCreate()
@@ -32,6 +28,5 @@ public class DeveloperNodeCreationStrategy : BaseGameNodeCreationStrategy
                     }
                 })
                 .ExecuteWithoutResultsAsync();
-        }
     }
 }

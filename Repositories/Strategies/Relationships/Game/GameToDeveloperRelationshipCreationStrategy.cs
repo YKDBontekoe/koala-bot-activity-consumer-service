@@ -12,19 +12,14 @@ public class GameToDeveloperRelationshipCreationStrategy : BaseGameRelationshipC
 
     public override async Task CreateRelationship(GameActivity activity)
     {
-        if (!IsActivityValid(activity))
-        {
-            return;
-        }
-        
+        if (!IsActivityValid(activity)) return;
+
         foreach (var developer in activity.GameInfo.Developers)
-        {
             await Client.Cypher
                 .Match("(d:Developer)", "(g:Game)")
                 .Where((DeveloperEntity d) => d.Name == developer)
                 .AndWhere((GameEntity a) => a.Name == activity.Name)
                 .Merge("(g)-[:IS_DEVELOPED_BY]->(d)")
                 .ExecuteWithoutResultsAsync();
-        }
     }
 }

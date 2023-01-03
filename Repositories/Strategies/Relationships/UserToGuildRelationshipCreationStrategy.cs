@@ -16,20 +16,15 @@ public class UserToGuildRelationshipCreationStrategy : IRelationshipCreationStra
 
     public async Task CreateRelationship(Activity activity)
     {
-        if (!IsActivityValid(activity))
-        {
-            return;
-        }
-  
+        if (!IsActivityValid(activity)) return;
+
         foreach (var guild in activity.User.Guilds)
-        {
             await _client.Cypher
                 .Match("(u:User)", "(g:Guild)")
                 .Where((UserEntity u) => u.Name == activity.User.Username)
                 .AndWhere((GuildEntity g) => g.Name == guild.Name)
                 .Merge("(u)-[:MEMBER_OF]->(g)")
                 .ExecuteWithoutResultsAsync();
-        }
     }
 
     public bool IsActivityValid(Activity activity)

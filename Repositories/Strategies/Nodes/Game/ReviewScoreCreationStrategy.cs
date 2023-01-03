@@ -12,11 +12,8 @@ public class ReviewScoreCreationStrategy : BaseGameNodeCreationStrategy
 
     public override async Task CreateNode(GameActivity activity)
     {
-        if (!IsActivityValid(activity))
-        {
-            return;
-        }
-        
+        if (!IsActivityValid(activity)) return;
+
         await Client.Cypher
             .Merge("(d:ReviewScore {name: $name})")
             .OnCreate()

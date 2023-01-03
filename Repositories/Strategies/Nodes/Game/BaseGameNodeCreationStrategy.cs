@@ -1,5 +1,4 @@
-﻿using Koala.ActivityConsumerService.Constants;
-using Koala.ActivityConsumerService.Models.Activities;
+﻿using Koala.ActivityConsumerService.Models.Activities;
 using Koala.ActivityConsumerService.Repositories.Strategies.Interfaces;
 using Neo4jClient;
 
